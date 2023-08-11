@@ -1,5 +1,5 @@
 const express = require('express')
-const verifyToken = require('../controllers/auth')
+const verifyToken = require('../middleware/auth')
 const { getUser, getUserFriends, addRemoveFriend } = require('../controllers/users')
 const router = express.Router();
 

@@ -8,6 +8,7 @@ const morgan =  require('morgan')
 
 const authRoutes = require('./controllers/auth')
 const userRoutes =  require('./routes/users')
+const postRoutes = require('./routes/posts')
 
 //Configuration
 dotenv.config()
@@ -26,6 +27,7 @@ app.use(cors())
 //Routes middleware
 app.use('/api/auth', authRoutes)
 app.use('/api/users', userRoutes)
+app.use('/api/posts', postRoutes)
 
 
 //Mongoose Setup

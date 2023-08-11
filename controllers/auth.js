@@ -4,13 +4,10 @@ const User = require('../models/User')
 const router = require('express').Router()
 const multer = require('multer')
 const path = require('path')
-const nodemailer = require('nodemailer')
 require('dotenv').config();
 const transporter = require('../mails/mailConfig')
 const crypto = require('crypto')
 
-//Création de Secret Key avec crypto
-const secretKey = crypto.randomBytes(32).toString('hex');
 
 //Configuration du stockages des fichiers uploader
 const storage = multer.diskStorage({
@@ -66,7 +63,8 @@ router.post('/register', upload.single("image"), async(req, res)=> {
             location,
             occupation,
             viewedProfile: Math.floor(Math.random() * 10000),
-            impressions: Math.floor(Math.random() * 10000)
+            impressions: Math.floor(Math.random() * 10000),
+            secretKey: crypto.randomBytes(32).toString('hex')
         })
 
         const savedUser = await newUser.save();
@@ -110,32 +108,29 @@ router.post('/login', async(req, res)=>{
         const isMatch = await bcrypt.compare(password, user.password);
         if(!isMatch) return res.status(400).json({message: "Invalid credentials."})
 
-        const token = jwt.sign({id: user._id}, secretKey);
+        const token = jwt.sign({ id: user._id}, user.secretKey);
+        
         delete user.password
-        res.status(200).json({token, user})
+        res.status(200).json(
+            {token, 
+            id: user._id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            picturePath: user.picturePath,
+            friends: user.friends,
+            location: user.location,
+            occupation: user.occupation,
+            viewedProfile: user.viewedProfile,
+            impressions: user.impressions
+            }
+            )
 
     }catch(err){
         res.status(500).json({err: err.message});
     }
 })
 
-//Verification du token
-const verifyToken = (req, res, next)=> {
-    const token = req.cookies.accessToken;
-  
-    if (!token) {
-      return res.status(401).json({ message: "Token manquant" });
-    }
-  
-    jwt.verify(token, secretKey, (err, user) => {
-      if (err) {
-        return res.status(403).json({ message: "Token invalide" });
-      }
-  
-      req.user = user;
-      next();
-    });
-  }
+  module.exports = router
 
-module.exports = router
-module.exports = verifyToken
+

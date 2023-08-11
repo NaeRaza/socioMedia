@@ -45,6 +45,10 @@ const UserSchema = new mongoose.Schema(
         impressions: {
             type: Number,
         },
+        secretKey: {
+            type: String,
+            required: true
+        }
     },
     {timestamps: true}
 )

@@ -1,5 +1,5 @@
 const express = require('express');
-const verifyToken = require("../middleware/auth")
+const { verifyToken } = require("../controllers/auth")
 const {createPost, getFeedPosts, getUserPosts, likePost} = require('../controllers/posts')
 const router = express.Router();
 const multer = require("multer")

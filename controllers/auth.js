@@ -8,6 +8,7 @@ require('dotenv').config();
 const transporter = require('../mails/mailConfig')
 const crypto = require('crypto')
 
+const secretKey = crypto.randomBytes(32).toString('hex')
 
 //Configuration du stockages des fichiers uploader
 const storage = multer.diskStorage({
@@ -63,8 +64,7 @@ router.post('/register', upload.single("image"), async(req, res)=> {
             location,
             occupation,
             viewedProfile: Math.floor(Math.random() * 10000),
-            impressions: Math.floor(Math.random() * 10000),
-            secretKey: crypto.randomBytes(32).toString('hex')
+            impressions: Math.floor(Math.random() * 10000)
         })
 
         const savedUser = await newUser.save();
@@ -108,7 +108,7 @@ router.post('/login', async(req, res)=>{
         const isMatch = await bcrypt.compare(password, user.password);
         if(!isMatch) return res.status(400).json({message: "Invalid credentials."})
 
-        const token = jwt.sign({ id: user._id}, user.secretKey);
+        const token = jwt.sign({ id: user._id}, secretKey);
         
         delete user.password
         res.status(200).json(
@@ -131,6 +131,31 @@ router.post('/login', async(req, res)=>{
     }
 })
 
+//Verification du token
+const verifyToken = async (req, res, next) => {
+    try {
+        let token = req.header("Authorization");
+
+        if (!token) {
+            return res.status(403).json("Access Denied");
+        }
+
+        if (token.startsWith("Bearer ")) {
+            token = token.slice(7, token.length).trimLeft();
+        }
+        
+        const verified = jwt.verify(token, secretKey); // Utilisez la clé secrète correcte
+        req.user = verified;
+        next();
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+
   module.exports = router
+
+  module.exports.verifyToken = verifyToken
 
 

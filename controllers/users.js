@@ -13,7 +13,7 @@ const getUser = async(req, res)=>{
 
 const getUserFriends = async(req, res)=>{
     try{
-    const { id } = req.params;
+    const { id, friendId} = req.params;
     const user = await User.findById(id); 
 
 

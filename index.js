@@ -9,6 +9,7 @@ const morgan =  require('morgan')
 const authRoutes = require('./controllers/auth')
 const userRoutes =  require('./routes/users')
 const postRoutes = require('./routes/posts')
+const rolesRoutes = require('./routes/roles')
 
 //Configuration
 dotenv.config()
@@ -28,6 +29,7 @@ app.use(cors())
 app.use('/api/auth', authRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/posts', postRoutes)
+app.use('/api/roles', rolesRoutes)
 
 
 //Mongoose Setup
